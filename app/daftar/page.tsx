@@ -46,8 +46,7 @@ export default function DaftarPage() {
     }
 
     setLoading(false);
-    router.push('/');
-    router.refresh();
+    window.location.href = '/'; return;
   }
 
   return (
