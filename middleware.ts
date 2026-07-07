@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
-        setAll(cookiesToSet: { name: string; value: string; options?: import('@supabase/ssr').CookieOptions }[]) {
+        setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({ request: { headers: request.headers } });
           cookiesToSet.forEach(({ name, value, options }) =>
@@ -25,6 +25,7 @@ export async function middleware(request: NextRequest) {
     }
   );
 
+  // Wajib dipanggil supaya token direfresh dan cookie ter-update di response
   await supabase.auth.getUser();
 
   return response;
@@ -32,6 +33,12 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    /*
+     * Jalankan middleware di semua path kecuali:
+     * - _next/static, _next/image (file statis Next.js)
+     * - favicon.ico
+     * - file gambar umum
+     */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };

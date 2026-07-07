@@ -46,7 +46,7 @@ export default function DaftarPage() {
     }
 
     setLoading(false);
-    window.location.href = '/'; return;
+    window.location.href = '/';
   }
 
   return (

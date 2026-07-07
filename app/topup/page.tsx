@@ -5,6 +5,8 @@ import TopupForm from './TopupForm';
 import { formatRupiah, formatDateTime } from '@/app/lib/utils';
 import type { TopupRequest } from '@/app/lib/types';
 
+export const dynamic = 'force-dynamic';
+
 export default async function TopupPage() {
   const supabase = createClient();
 
@@ -13,7 +15,7 @@ export default async function TopupPage() {
   if (!userData?.user) {
     return (
       <>
-        <Navbar />
+        <Navbar isLoggedIn={false} />
         <div className="max-w-[600px] mx-auto px-4 py-20 text-center">
           <h1 className="text-xl font-bold mb-2">Masuk untuk top up saldo</h1>
           <p className="text-text-dim text-sm mb-6">Kamu perlu login terlebih dahulu sebelum melakukan top up.</p>
@@ -37,7 +39,7 @@ export default async function TopupPage() {
 
   return (
     <>
-      <Navbar balance={profile?.balance ?? 0} />
+      <Navbar balance={profile?.balance ?? 0} isLoggedIn={true} />
 
       <div className="max-w-[700px] mx-auto px-3.5 sm:px-5 py-8 sm:py-10">
         <h1 className="text-xl sm:text-2xl font-extrabold mb-1">Top Up Saldo</h1>

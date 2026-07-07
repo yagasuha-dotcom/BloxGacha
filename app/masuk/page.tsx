@@ -25,7 +25,7 @@ export default function MasukPage() {
       setError('Email atau password salah.');
       return;
     }
-    window.location.href = '/'; return;
+    window.location.href = '/';
   }
 
   return (

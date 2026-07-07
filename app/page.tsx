@@ -5,7 +5,7 @@ import GameCard from '@/app/components/GameCard';
 import { Leaderboard, LiveFeed } from '@/app/components/CommunityPanels';
 import type { Game, GachaTransaction, Profile } from '@/app/lib/types';
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-dynamic'; // wajib dynamic karena baca status login per-user
 
 export default async function HomePage() {
   const supabase = createClient();
@@ -58,7 +58,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <Navbar balance={balance} />
+      <Navbar balance={balance} isLoggedIn={!!userData?.user} />
 
       <div className="max-w-[1180px] mx-auto px-3.5 sm:px-5">
         {/* HERO */}

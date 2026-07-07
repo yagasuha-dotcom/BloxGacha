@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { formatRupiah } from '@/app/lib/utils';
 
-export default function Navbar({ balance = 0 }: { balance?: number }) {
+export default function Navbar({ balance = 0, isLoggedIn = false }: { balance?: number; isLoggedIn?: boolean }) {
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-bg/90 backdrop-blur-md w-full">
       <div className="max-w-[1180px] mx-auto px-4 sm:px-5 py-3 flex items-center justify-between gap-2">
@@ -23,12 +23,28 @@ export default function Navbar({ balance = 0 }: { balance?: number }) {
             <span className="hidden sm:inline">Saldo:</span>
             <span className="text-gold font-bold">{formatRupiah(balance)}</span>
           </div>
-          <Link href="/masuk" className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-border text-xs sm:text-sm font-bold hover:-translate-y-0.5 transition-transform">
-            Masuk
-          </Link>
-          <Link href="/daftar" className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-accent text-[#062119] text-xs sm:text-sm font-bold hover:brightness-110 hover:-translate-y-0.5 transition-all">
-            Daftar
-          </Link>
+
+          {isLoggedIn ? (
+            <>
+              <Link href="/topup" className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-accent text-[#062119] text-xs sm:text-sm font-bold hover:brightness-110 hover:-translate-y-0.5 transition-all">
+                Top Up
+              </Link>
+              <form action="/api/auth/keluar" method="POST">
+                <button type="submit" className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-border text-xs sm:text-sm font-bold hover:-translate-y-0.5 transition-transform">
+                  Keluar
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link href="/masuk" className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg border border-border text-xs sm:text-sm font-bold hover:-translate-y-0.5 transition-transform">
+                Masuk
+              </Link>
+              <Link href="/daftar" className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-accent text-[#062119] text-xs sm:text-sm font-bold hover:brightness-110 hover:-translate-y-0.5 transition-all">
+                Daftar
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

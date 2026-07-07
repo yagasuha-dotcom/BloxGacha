@@ -27,7 +27,7 @@ export default async function MarketplacePage({ searchParams }: { searchParams: 
 
   return (
     <>
-      <Navbar balance={balance} />
+      <Navbar balance={balance} isLoggedIn={!!userData?.user} />
 
       <div className="max-w-[1180px] mx-auto px-3.5 sm:px-5">
         <section className="pt-8 sm:pt-10 pb-6">
