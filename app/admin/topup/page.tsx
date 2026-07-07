@@ -3,7 +3,7 @@ import { formatRupiah, formatDateTime } from '@/app/lib/utils';
 import TopupActions from './TopupActions';
 import type { TopupRequest } from '@/app/lib/types';
 
-export const revalidate = 5;
+export const dynamic = 'force-dynamic';
 
 export default async function AdminTopupPage() {
   const supabase = createClient();

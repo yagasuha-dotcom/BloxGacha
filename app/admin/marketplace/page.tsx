@@ -2,7 +2,7 @@ import { createClient } from '@/app/lib/supabase-server';
 import MarketplaceManager from './MarketplaceManager';
 import type { Game, MarketplaceListing } from '@/app/lib/types';
 
-export const revalidate = 5;
+export const dynamic = 'force-dynamic';
 
 export default async function AdminMarketplacePage() {
   const supabase = createClient();

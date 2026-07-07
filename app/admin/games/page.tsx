@@ -2,7 +2,7 @@ import { createClient } from '@/app/lib/supabase-server';
 import GameManager from './GameManager';
 import type { Game } from '@/app/lib/types';
 
-export const revalidate = 5;
+export const dynamic = 'force-dynamic';
 
 export default async function AdminGamesPage() {
   const supabase = createClient();

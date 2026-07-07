@@ -5,7 +5,7 @@ import GameCard from '@/app/components/GameCard';
 import { Leaderboard, LiveFeed } from '@/app/components/CommunityPanels';
 import type { Game, GachaTransaction, Profile } from '@/app/lib/types';
 
-export const revalidate = 10; // refresh data setiap 10 detik untuk kesan "live"
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const supabase = createClient();

@@ -5,7 +5,7 @@ import Footer from '@/app/components/Footer';
 import GachaTierSection from './GachaTierSection';
 import type { GachaAccountTier, GachaAccountItem, GachaCurrencyTier, GachaCurrencyRange } from '@/app/lib/types';
 
-export const revalidate = 10;
+export const dynamic = 'force-dynamic';
 
 export default async function GamePage({ params }: { params: { slug: string } }) {
   const supabase = createClient();

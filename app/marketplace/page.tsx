@@ -4,7 +4,7 @@ import Footer from '@/app/components/Footer';
 import type { Game, MarketplaceListing } from '@/app/lib/types';
 import { formatRupiah } from '@/app/lib/utils';
 
-export const revalidate = 10;
+export const dynamic = 'force-dynamic';
 
 export default async function MarketplacePage({ searchParams }: { searchParams: { game?: string } }) {
   const supabase = createClient();
