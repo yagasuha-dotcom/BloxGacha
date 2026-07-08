@@ -1,9 +1,9 @@
 import { createClient } from '@/app/lib/supabase-server';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
-import TopupForm from './TopupForm';
+import TopupStepOne from './TopupStepOne';
 import { formatRupiah, formatDateTime } from '@/app/lib/utils';
-import type { TopupRequest } from '@/app/lib/types';
+import type { TopupRequest, PaymentMethod } from '@/app/lib/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,9 +30,15 @@ export default async function TopupPage() {
 
   const { data: profile } = await supabase.from('profiles').select('balance').eq('id', userData.user.id).single();
 
+  const { data: paymentMethods } = await supabase
+    .from('payment_methods')
+    .select('*')
+    .eq('is_active', true)
+    .order('sort_order');
+
   const { data: history } = await supabase
     .from('topup_requests')
-    .select('*')
+    .select('*, payment_methods(name)')
     .eq('user_id', userData.user.id)
     .order('created_at', { ascending: false })
     .limit(10);
@@ -41,13 +47,13 @@ export default async function TopupPage() {
     <>
       <Navbar balance={profile?.balance ?? 0} isLoggedIn={true} />
 
-      <div className="max-w-[700px] mx-auto px-3.5 sm:px-5 py-8 sm:py-10">
+      <div className="max-w-[700px] mx-auto px-3.5 sm:px-5 py-8 sm:py-10 pb-28">
         <h1 className="text-xl sm:text-2xl font-extrabold mb-1">Top Up Saldo</h1>
         <p className="text-text-dim text-sm mb-6">
-          Transfer manual, lalu upload bukti transfer. Saldo ditambahkan setelah admin memverifikasi.
+          Saldo kamu saat ini: <span className="text-gold font-bold">{formatRupiah(profile?.balance ?? 0)}</span>
         </p>
 
-        <TopupForm />
+        <TopupStepOne paymentMethods={(paymentMethods as PaymentMethod[]) ?? []} />
 
         <div className="mt-10">
           <h2 className="text-sm font-bold text-text-dim mb-3">Riwayat Top Up</h2>
@@ -62,7 +68,7 @@ export default async function TopupPage() {
                   <div>
                     <div className="font-bold text-sm">{formatRupiah(req.amount)}</div>
                     <div className="text-xs text-text-dim mt-0.5">
-                      Kode: {req.unique_code} · {formatDateTime(req.created_at)}
+                      {req.payment_methods?.name ?? 'Transfer'} · {formatDateTime(req.created_at)}
                     </div>
                   </div>
                   <span

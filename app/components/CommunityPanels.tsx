@@ -1,15 +1,17 @@
 import type { GachaTransaction, Profile } from '@/app/lib/types';
 import { formatRupiah, formatDateTime } from '@/app/lib/utils';
+import { IconTrophy, IconTarget, IconRadar } from './Icons';
 
 export function Leaderboard({ users }: { users: Pick<Profile, 'id' | 'username' | 'avatar_url' | 'total_gacha_count'>[] }) {
   return (
     <div className="bg-surface border border-border rounded-2xl overflow-hidden">
-      <div className="px-4 sm:px-[18px] py-4 border-b border-border font-bold text-sm flex items-center gap-2">
-        🏆 Top Pembuka Gacha
+      <div className="px-4 sm:px-[18px] py-4 border-b border-border font-bold text-sm flex items-center gap-2 text-gold">
+        <IconTrophy className="w-4 h-4" />
+        <span className="text-text">Top Pembuka Gacha</span>
       </div>
       {users.length === 0 ? (
         <div className="py-10 px-5 text-center text-text-dim text-[13px]">
-          <div className="text-[28px] mb-2.5 opacity-50">🎯</div>
+          <IconTarget className="w-7 h-7 mx-auto mb-2.5 opacity-40" />
           Belum ada yang membuka gacha.<br />Jadilah yang pertama masuk papan peringkat.
         </div>
       ) : (
@@ -42,7 +44,7 @@ export function LiveFeed({ transactions }: { transactions: GachaTransaction[] })
       </div>
       {transactions.length === 0 ? (
         <div className="py-10 px-5 text-center text-text-dim text-[13px]">
-          <div className="text-[28px] mb-2.5 opacity-50">📡</div>
+          <IconRadar className="w-7 h-7 mx-auto mb-2.5 opacity-40" />
           Belum ada transaksi.<br />Setiap pembelian akan muncul di sini secara real-time.
         </div>
       ) : (

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from '@/app/components/ToastProvider';
 import { createClient } from '@/app/lib/supabase-client';
 import { useRouter } from 'next/navigation';
 import { formatRupiah } from '@/app/lib/utils';
@@ -15,6 +16,7 @@ type Props = {
 export default function CurrencyTierPanel({ gameId, initialTiers, initialRanges }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const { showToast } = useToast();
 
   const [tiers, setTiers] = useState(initialTiers);
   const [ranges, setRanges] = useState(initialRanges);
@@ -35,7 +37,7 @@ export default function CurrencyTierPanel({ gameId, initialTiers, initialRanges 
       .single();
     setSaving(false);
     if (error) {
-      alert('Gagal menambah tier: ' + error.message);
+      showToast('Gagal menambah tier: ' + error.message, 'error');
       return;
     }
     setTiers([...tiers, data as GachaCurrencyTier]);
@@ -50,7 +52,7 @@ export default function CurrencyTierPanel({ gameId, initialTiers, initialRanges 
     if (!confirm('Hapus tier currency ini?')) return;
     const { error } = await supabase.from('gacha_currency_tiers').delete().eq('id', id);
     if (error) {
-      alert('Gagal menghapus: ' + error.message);
+      showToast('Gagal menghapus: ' + error.message, 'error');
       return;
     }
     setTiers(tiers.filter((t) => t.id !== id));
@@ -167,6 +169,7 @@ function RangeManager({
   onRangesChange: (ranges: GachaCurrencyRange[]) => void;
 }) {
   const supabase = createClient();
+  const { showToast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [min, setMin] = useState('');
   const [max, setMax] = useState('');
@@ -179,11 +182,11 @@ function RangeManager({
     if (!min || !max || !chance) return;
     const chanceNum = parseFloat(chance);
     if (totalChance + chanceNum > 100) {
-      alert(`Total chance akan menjadi ${(totalChance + chanceNum).toFixed(1)}%. Tidak boleh melebihi 100%.`);
+      showToast(`Total chance akan menjadi ${(totalChance + chanceNum).toFixed(1)}%. Tidak boleh melebihi 100%.`, 'error');
       return;
     }
     if (parseInt(min, 10) > parseInt(max, 10)) {
-      alert('Nilai minimum tidak boleh lebih besar dari maksimum.');
+      showToast('Nilai minimum tidak boleh lebih besar dari maksimum.', 'error');
       return;
     }
 
@@ -196,7 +199,7 @@ function RangeManager({
     setSaving(false);
 
     if (error) {
-      alert('Gagal menyimpan range: ' + error.message);
+      showToast('Gagal menyimpan range: ' + error.message, 'error');
       return;
     }
 
@@ -211,7 +214,7 @@ function RangeManager({
     if (!confirm('Hapus range ini?')) return;
     const { error } = await supabase.from('gacha_currency_ranges').delete().eq('id', id);
     if (error) {
-      alert('Gagal menghapus: ' + error.message);
+      showToast('Gagal menghapus: ' + error.message, 'error');
       return;
     }
     onRangesChange(ranges.filter((r) => r.id !== id));

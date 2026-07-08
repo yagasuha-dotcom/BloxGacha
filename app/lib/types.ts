@@ -96,14 +96,26 @@ export type Profile = {
   total_gacha_count: number;
 };
 
+export type PaymentMethod = {
+  id: string;
+  name: string;
+  logo_url: string | null;
+  account_number: string | null;
+  account_name: string | null;
+  instructions: string | null;
+  is_active: boolean;
+};
+
 export type TopupRequest = {
   id: string;
   user_id: string;
   amount: number;
   unique_code: string;
   proof_image_url: string;
+  payment_method_id: string | null;
   status: 'pending' | 'approved' | 'rejected';
   admin_note: string | null;
   created_at: string;
   profiles?: { username: string };
+  payment_methods?: { name: string };
 };

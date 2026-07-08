@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from '@/app/components/ToastProvider';
 import { createClient } from '@/app/lib/supabase-client';
 import { useRouter } from 'next/navigation';
 import { formatRupiah } from '@/app/lib/utils';
 import type { Game, MarketplaceListing } from '@/app/lib/types';
 
 export default function MarketplaceManager({ games, initialListings }: { games: Game[]; initialListings: MarketplaceListing[] }) {
+  const { showToast } = useToast();
   const router = useRouter();
   const supabase = createClient();
 
@@ -23,7 +25,7 @@ export default function MarketplaceManager({ games, initialListings }: { games: 
 
   async function handleSubmit() {
     if (!gameId || !title.trim() || !price || !email.trim() || !password.trim()) {
-      alert('Lengkapi semua kolom wajib.');
+      showToast('Lengkapi semua kolom wajib.', 'error');
       return;
     }
 
@@ -63,7 +65,7 @@ export default function MarketplaceManager({ games, initialListings }: { games: 
       setShowForm(false);
       router.refresh();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Terjadi kesalahan.');
+      showToast(err instanceof Error ? err.message : 'Terjadi kesalahan.', 'error');
     } finally {
       setSaving(false);
     }
@@ -73,7 +75,7 @@ export default function MarketplaceManager({ games, initialListings }: { games: 
     if (!confirm('Hapus listing ini?')) return;
     const { error } = await supabase.from('marketplace_listings').delete().eq('id', id);
     if (error) {
-      alert('Gagal menghapus: ' + error.message);
+      showToast('Gagal menghapus: ' + error.message, 'error');
       return;
     }
     setListings(listings.filter((l) => l.id !== id));

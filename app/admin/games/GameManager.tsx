@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from '@/app/components/ToastProvider';
 import { createClient } from '@/app/lib/supabase-client';
 import { useRouter } from 'next/navigation';
 import type {
@@ -32,6 +33,7 @@ export default function GameManager({
 }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const { showToast } = useToast();
 
   const [games, setGames] = useState(initialGames);
   const [selectedGameId, setSelectedGameId] = useState<string | null>(initialGames[0]?.id ?? null);
@@ -51,7 +53,7 @@ export default function GameManager({
       .single();
     setSaving(false);
     if (error) {
-      alert('Gagal menambah game: ' + error.message);
+      showToast('Gagal menambah game: ' + error.message, 'error');
       return;
     }
     setGames([...games, data as Game]);
@@ -65,7 +67,7 @@ export default function GameManager({
     if (!confirm('Hapus game ini beserta semua tier & item di dalamnya? Tindakan ini tidak bisa dibatalkan.')) return;
     const { error } = await supabase.from('games').delete().eq('id', id);
     if (error) {
-      alert('Gagal menghapus: ' + error.message);
+      showToast('Gagal menghapus: ' + error.message, 'error');
       return;
     }
     setGames(games.filter((g) => g.id !== id));

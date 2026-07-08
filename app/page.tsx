@@ -3,6 +3,7 @@ import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
 import GameCard from '@/app/components/GameCard';
 import { Leaderboard, LiveFeed } from '@/app/components/CommunityPanels';
+import { IconTrophy } from '@/app/components/Icons';
 import type { Game, GachaTransaction, Profile } from '@/app/lib/types';
 
 export const dynamic = 'force-dynamic'; // wajib dynamic karena baca status login per-user
@@ -27,8 +28,9 @@ export default async function HomePage() {
     .eq('is_active', true)
     .order('sort_order');
 
-  // Hitung jumlah tier aktif per game (akun + currency + box gabungan)
-  const tierCounts: Record<string, number> = {};
+  // Hitung tier akun & tier currency TERPISAH per game (bukan digabung lagi)
+  const accountTierCounts: Record<string, number> = {};
+  const currencyTierCounts: Record<string, number> = {};
   if (games) {
     for (const game of games as Game[]) {
       const { count: accCount } = await supabase
@@ -41,9 +43,13 @@ export default async function HomePage() {
         .select('*', { count: 'exact', head: true })
         .eq('game_id', game.id)
         .eq('is_active', true);
-      tierCounts[game.id] = (accCount ?? 0) + (curCount ?? 0);
+      accountTierCounts[game.id] = accCount ?? 0;
+      currencyTierCounts[game.id] = curCount ?? 0;
     }
   }
+
+  // Game yang punya minimal 1 tier currency aktif -> ditampilkan di section Currency
+  const gamesWithCurrency = (games as Game[] | null)?.filter((g) => (currencyTierCounts[g.id] ?? 0) > 0) ?? [];
 
   const { data: leaderboard } = await supabase
     .from('leaderboard')
@@ -83,7 +89,7 @@ export default async function HomePage() {
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
             {(games as Game[] | null)?.map((game) => (
-              <GameCard key={game.id} game={game} tierCount={tierCounts[game.id] ?? 0} />
+              <GameCard key={game.id} game={game} tierCount={accountTierCounts[game.id] ?? 0} />
             ))}
             {(!games || games.length === 0) && (
               <div className="col-span-2 sm:col-span-4 border border-dashed border-border rounded-2xl py-12 text-center text-text-dim text-sm">
@@ -91,6 +97,28 @@ export default async function HomePage() {
               </div>
             )}
           </div>
+        </section>
+
+        {/* GACHA CURRENCY — section terpisah, bukan numpuk dengan akun */}
+        <section className="py-9 sm:py-[52px]">
+          <div className="mb-6">
+            <div className="text-lg sm:text-[22px] font-extrabold flex items-center gap-2.5">
+              <span className="font-pixel text-[9px] text-bg bg-gold px-2 py-1.5 rounded">CURRENCY</span>
+              Gacha Currency
+            </div>
+            <div className="text-text-dim text-[13px] mt-1">Dapatkan Robux, Diamond, dan currency game lain secara acak dalam rentang tertentu.</div>
+          </div>
+          {gamesWithCurrency.length === 0 ? (
+            <div className="border border-dashed border-border rounded-2xl py-12 text-center text-text-dim text-sm">
+              Belum ada currency yang ditambahkan. Tambahkan lewat Admin Panel.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4">
+              {gamesWithCurrency.map((game) => (
+                <GameCard key={game.id} game={game} tierCount={currencyTierCounts[game.id] ?? 0} mode="currency" />
+              ))}
+            </div>
+          )}
         </section>
 
         {/* MARKETPLACE */}
@@ -108,7 +136,10 @@ export default async function HomePage() {
         {/* LEADERBOARD + FEED */}
         <section className="py-9 sm:py-[52px]">
           <div className="mb-6">
-            <div className="text-lg sm:text-[22px] font-extrabold">🏆 Papan Peringkat &amp; Aktivitas</div>
+            <div className="text-lg sm:text-[22px] font-extrabold flex items-center gap-2.5">
+              <IconTrophy className="w-5 h-5 text-gold" />
+              Papan Peringkat &amp; Aktivitas
+            </div>
             <div className="text-text-dim text-[13px] mt-1">Data asli dari transaksi berjalan — dimulai dari nol.</div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-[1fr_1.3fr] gap-3.5 sm:gap-5 items-start">

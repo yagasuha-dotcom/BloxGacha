@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from '@/app/components/ToastProvider';
+import { IconGamepad } from '@/app/components/Icons';
 import { createClient } from '@/app/lib/supabase-client';
 import { useRouter } from 'next/navigation';
 import { formatRupiah } from '@/app/lib/utils';
@@ -15,6 +17,7 @@ type Props = {
 export default function AccountTierPanel({ gameId, initialTiers, initialItems }: Props) {
   const router = useRouter();
   const supabase = createClient();
+  const { showToast } = useToast();
 
   const [tiers, setTiers] = useState(initialTiers);
   const [items, setItems] = useState(initialItems);
@@ -34,7 +37,7 @@ export default function AccountTierPanel({ gameId, initialTiers, initialItems }:
       .single();
     setSaving(false);
     if (error) {
-      alert('Gagal menambah tier: ' + error.message);
+      showToast('Gagal menambah tier: ' + error.message, 'error');
       return;
     }
     setTiers([...tiers, data as GachaAccountTier]);
@@ -48,7 +51,7 @@ export default function AccountTierPanel({ gameId, initialTiers, initialItems }:
     if (!confirm('Hapus tier ini beserta semua item di dalamnya?')) return;
     const { error } = await supabase.from('gacha_account_tiers').delete().eq('id', id);
     if (error) {
-      alert('Gagal menghapus: ' + error.message);
+      showToast('Gagal menghapus: ' + error.message, 'error');
       return;
     }
     setTiers(tiers.filter((t) => t.id !== id));
@@ -58,7 +61,7 @@ export default function AccountTierPanel({ gameId, initialTiers, initialItems }:
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-bold">🎮 Tier Gacha Akun</h2>
+        <h2 className="text-sm font-bold flex items-center gap-2"><IconGamepad className="w-4 h-4 text-accent" /> Tier Gacha Akun</h2>
         <button
           onClick={() => setShowNewTier(!showNewTier)}
           className="text-xs font-bold text-accent"
@@ -157,6 +160,7 @@ function ItemManager({
   items: GachaAccountItem[];
   onItemsChange: (items: GachaAccountItem[]) => void;
 }) {
+  const { showToast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [itemName, setItemName] = useState('');
   const [chance, setChance] = useState('');
@@ -169,12 +173,12 @@ function ItemManager({
 
   async function handleAddItem() {
     if (!itemName.trim() || !chance || !email.trim() || !password.trim()) {
-      alert('Nama item, chance, email, dan password wajib diisi.');
+      showToast('Nama item, chance, email, dan password wajib diisi.', 'error');
       return;
     }
     const chanceNum = parseFloat(chance);
     if (totalChance + chanceNum > 100) {
-      alert(`Total chance akan menjadi ${(totalChance + chanceNum).toFixed(1)}%. Total tidak boleh melebihi 100%.`);
+      showToast(`Total chance akan menjadi ${(totalChance + chanceNum).toFixed(1)}%. Total tidak boleh melebihi 100%.`, 'error');
       return;
     }
 
@@ -201,7 +205,7 @@ function ItemManager({
       setExtraInfo('');
       setShowForm(false);
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Terjadi kesalahan.');
+      showToast(err instanceof Error ? err.message : 'Terjadi kesalahan.', 'error');
     } finally {
       setSaving(false);
     }
@@ -212,7 +216,7 @@ function ItemManager({
     const supabase = createClient();
     const { error } = await supabase.from('gacha_account_items').delete().eq('id', id);
     if (error) {
-      alert('Gagal menghapus: ' + error.message);
+      showToast('Gagal menghapus: ' + error.message, 'error');
       return;
     }
     onItemsChange(items.filter((i) => i.id !== id));

@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from '@/app/components/ToastProvider';
 import { useRouter } from 'next/navigation';
 import TierCard from '@/app/components/TierCard';
 import TierInfoModal from '@/app/components/TierInfoModal';
 import GachaResultModal from '@/app/components/GachaResultModal';
+import { IconGamepad } from '@/app/components/Icons';
 import { formatRupiah } from '@/app/lib/utils';
 import type { GachaAccountTier, GachaAccountItem, GachaCurrencyTier, GachaCurrencyRange } from '@/app/lib/types';
 
@@ -17,6 +19,7 @@ type Props = {
 };
 
 export default function GachaTierSection({ gameName, accountTiers, accountItems, currencyTiers, currencyRanges }: Props) {
+  const { showToast } = useToast();
   const router = useRouter();
   const [modalTier, setModalTier] = useState<{ name: string; price: number; items: { id: string; item_name: string; chance: number; image_url?: string | null }[] } | null>(null);
   const [result, setResult] = useState<{ itemName: string; imageUrl?: string | null } | null>(null);
@@ -53,7 +56,7 @@ export default function GachaTierSection({ gameName, accountTiers, accountItems,
       setResult({ itemName: body.result.itemName, imageUrl: body.result.imageUrl });
       router.refresh();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Terjadi kesalahan.');
+      showToast(err instanceof Error ? err.message : 'Terjadi kesalahan.', 'error');
     } finally {
       setOpening(null);
     }
@@ -72,7 +75,7 @@ export default function GachaTierSection({ gameName, accountTiers, accountItems,
       setResult({ itemName: body.result.itemName });
       router.refresh();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Terjadi kesalahan.');
+      showToast(err instanceof Error ? err.message : 'Terjadi kesalahan.', 'error');
     } finally {
       setOpening(null);
     }
@@ -83,7 +86,7 @@ export default function GachaTierSection({ gameName, accountTiers, accountItems,
       {/* GACHA AKUN */}
       <section className="py-8 sm:py-[52px]">
         <div className="mb-6">
-          <div className="text-lg sm:text-xl font-extrabold">🎮 {gameName} — Pilih Tier</div>
+          <div className="text-lg sm:text-xl font-extrabold flex items-center gap-2"><IconGamepad className="w-5 h-5 text-accent" /> {gameName} — Pilih Tier</div>
         </div>
 
         {accountTiers.length === 0 ? (
@@ -115,7 +118,7 @@ export default function GachaTierSection({ gameName, accountTiers, accountItems,
 
       {/* GACHA CURRENCY */}
       {currencyTiers.length > 0 && (
-        <section className="py-8 sm:py-[52px]">
+        <section id="currency" className="py-8 sm:py-[52px] scroll-mt-20">
           <div className="mb-6">
             <div className="text-lg sm:text-xl font-extrabold flex items-center gap-2.5">
               <span className="font-pixel text-[9px] text-bg bg-gold px-2 py-1.5 rounded">CURRENCY</span>

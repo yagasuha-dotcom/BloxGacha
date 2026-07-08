@@ -1,12 +1,20 @@
 import Link from 'next/link';
 import type { Game } from '@/app/lib/types';
 
-export default function GameCard({ game, tierCount = 0 }: { game: Game; tierCount?: number }) {
+type Props = {
+  game: Game;
+  tierCount?: number;
+  mode?: 'account' | 'currency';
+};
+
+export default function GameCard({ game, tierCount = 0, mode = 'account' }: Props) {
+  const href = mode === 'currency' ? `/gacha/${game.slug}#currency` : `/gacha/${game.slug}`;
+  const label = mode === 'currency' ? 'paket currency' : 'tier tersedia';
+
   return (
     <Link
-      href={`/gacha/${game.slug}`}
+      href={href}
       className="group bg-surface border border-border rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform"
-      style={{ borderColor: undefined }}
     >
       <div
         className="h-20 sm:h-[100px] flex items-center justify-center relative"
@@ -19,7 +27,7 @@ export default function GameCard({ game, tierCount = 0 }: { game: Game; tierCoun
       </div>
       <div className="p-3 sm:p-4">
         <div className="font-bold text-[13.5px] sm:text-[15px]">{game.name}</div>
-        <div className="text-[11px] sm:text-xs text-text-dim mt-0.5">{tierCount} tier tersedia</div>
+        <div className="text-[11px] sm:text-xs text-text-dim mt-0.5">{tierCount} {label}</div>
       </div>
     </Link>
   );

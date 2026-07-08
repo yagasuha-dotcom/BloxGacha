@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { formatRupiah } from '@/app/lib/utils';
+import { IconCoin } from './Icons';
 
 export default function Navbar({ balance = 0, isLoggedIn = false }: { balance?: number; isLoggedIn?: boolean }) {
   return (
@@ -17,9 +18,7 @@ export default function Navbar({ balance = 0, isLoggedIn = false }: { balance?: 
 
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
           <div className="flex items-center gap-1.5 bg-surface border border-border px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold text-text-dim whitespace-nowrap">
-            <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2v20M6 6l6-4 6 4M6 10h12M7 14h10M8 18h8" stroke="#FFB84D" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <IconCoin className="w-3.5 h-3.5 shrink-0 text-gold" />
             <span className="hidden sm:inline">Saldo:</span>
             <span className="text-gold font-bold">{formatRupiah(balance)}</span>
           </div>

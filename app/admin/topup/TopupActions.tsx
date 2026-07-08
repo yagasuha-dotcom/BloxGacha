@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from '@/app/components/ToastProvider';
 import { useRouter } from 'next/navigation';
 
 export default function TopupActions({ requestId, userId, amount }: { requestId: string; userId: string; amount: number }) {
+  const { showToast } = useToast();
   const router = useRouter();
   const [loading, setLoading] = useState<'approve' | 'reject' | null>(null);
 
@@ -21,7 +23,7 @@ export default function TopupActions({ requestId, userId, amount }: { requestId:
       }
       router.refresh();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Terjadi kesalahan.');
+      showToast(err instanceof Error ? err.message : 'Terjadi kesalahan.', 'error');
     } finally {
       setLoading(null);
     }
