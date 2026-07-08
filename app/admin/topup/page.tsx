@@ -8,9 +8,9 @@ export const dynamic = 'force-dynamic';
 export default async function AdminTopupPage() {
   const supabase = createClient();
 
-  const { data: requests, error } = await supabase
+  const { data: requestsRaw, error } = await supabase
     .from('topup_requests')
-    .select('*, profiles(username)')
+    .select('*')
     .order('created_at', { ascending: false })
     .limit(50);
 
@@ -18,8 +18,30 @@ export default async function AdminTopupPage() {
     console.error('TOPUP QUERY ERROR:', error);
   }
 
-  const pending = ((requests as TopupRequest[]) ?? []).filter((r) => r.status === 'pending');
-  const resolved = ((requests as TopupRequest[]) ?? []).filter((r) => r.status !== 'pending');
+  const requestsBase = (requestsRaw as TopupRequest[]) ?? [];
+
+  // Ambil username secara terpisah untuk menghindari ambiguitas relasi FK
+  const userIds = Array.from(new Set(requestsBase.map((r) => r.user_id)));
+  let usernameMap: Record<string, string> = {};
+
+  if (userIds.length > 0) {
+    const { data: profilesData } = await supabase
+      .from('profiles')
+      .select('id, username')
+      .in('id', userIds);
+
+    usernameMap = Object.fromEntries(
+      (profilesData ?? []).map((p: { id: string; username: string }) => [p.id, p.username])
+    );
+  }
+
+  const requests = requestsBase.map((r) => ({
+    ...r,
+    profiles: { username: usernameMap[r.user_id] ?? 'Pengguna' },
+  }));
+
+  const pending = requests.filter((r) => r.status === 'pending');
+  const resolved = requests.filter((r) => r.status !== 'pending');
 
   return (
     <div>
