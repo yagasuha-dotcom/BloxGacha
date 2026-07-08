@@ -1,9 +1,10 @@
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 import { createClient } from '@/app/lib/supabase-server';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
-import GachaTierSection from './GachaTierSection';
-import type { GachaAccountTier, GachaAccountItem, GachaCurrencyTier, GachaCurrencyRange } from '@/app/lib/types';
+import GachaAccountSection from './GachaAccountSection';
+import type { GachaAccountTier, GachaAccountItem } from '@/app/lib/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,20 +46,15 @@ export default async function GamePage({ params }: { params: { slug: string } })
         .in('tier_id', accountTierIds)
     : { data: [] as GachaAccountItem[] };
 
-  const { data: currencyTiers } = await supabase
+  // Cek apakah game ini punya currency tier, untuk menampilkan tombol link
+  const { data: currencyTierCheck } = await supabase
     .from('gacha_currency_tiers')
-    .select('*')
+    .select('id')
     .eq('game_id', game.id)
     .eq('is_active', true)
-    .order('sort_order');
+    .limit(1);
 
-  const currencyTierIds = (currencyTiers ?? []).map((t) => t.id);
-  const { data: currencyRanges } = currencyTierIds.length
-    ? await supabase
-        .from('gacha_currency_ranges')
-        .select('*')
-        .in('tier_id', currencyTierIds)
-    : { data: [] as GachaCurrencyRange[] };
+  const hasCurrency = (currencyTierCheck ?? []).length > 0;
 
   return (
     <>
@@ -74,14 +70,21 @@ export default async function GamePage({ params }: { params: { slug: string } })
           </div>
           <h1 className="text-xl sm:text-3xl font-extrabold">{game.name}</h1>
           <p className="text-text-dim text-sm mt-1">Klik &quot;Info&quot; untuk lihat isi pool &amp; peluang sebelum membeli.</p>
+
+          {hasCurrency && (
+            <Link
+              href={`/gacha/${game.slug}/currency`}
+              className="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-lg border border-gold/40 text-gold text-xs sm:text-sm font-bold hover:-translate-y-0.5 transition-transform"
+            >
+              Lihat Gacha Currency untuk {game.name} →
+            </Link>
+          )}
         </section>
 
-        <GachaTierSection
+        <GachaAccountSection
           gameName={game.name}
           accountTiers={(accountTiers as GachaAccountTier[]) ?? []}
           accountItems={(accountItems as GachaAccountItem[]) ?? []}
-          currencyTiers={(currencyTiers as GachaCurrencyTier[]) ?? []}
-          currencyRanges={(currencyRanges as GachaCurrencyRange[]) ?? []}
         />
       </div>
 
